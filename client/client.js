@@ -62,6 +62,7 @@ throttle = function(func, limit, context) {
 
 throttledMouse = throttle(function(event){
   socket.emit('mousemove', {
+    location: window.location.href,
     x: event.pageX, 
     y: event.pageY
   });
@@ -69,10 +70,19 @@ throttledMouse = throttle(function(event){
 
 throttledScroll = throttle(function(){
   socket.emit('scroll', {
+    location: window.location.href,
     xOffset: window.pageXOffset, 
     yOffset: window.pageYOffset
   });
 }, 1000);
+
+login = function(){
+  socket.emit('login', {
+    username: 'q',
+    password: 'q',
+    location: window.location.href
+  });
+};
 
 //Window pageXOffset and pageYOffset
 
