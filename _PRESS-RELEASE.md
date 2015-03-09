@@ -17,28 +17,36 @@ Once the project moves into development, the press release can be used as a touc
  -->
  
 ## Heading ##
-  > Name the product in a way the reader (i.e. your target customers) will understand.
+  > Over The Shoulder: Real-time analytics
 
 ## Sub-Heading ##
-  > Describe who the market for the product is and what benefit they get. One sentence only underneath the title.
+  > Watch users interact with your website.
 
 ## Summary ##
-  > Give a summary of the product and the benefit. Assume the reader will not read anything else so make this paragraph good.
+  > While historical analytics are useful they lack the data available from
+  live user testing. Watching users live while they interact with your site
+  provides useful information especially for rapidly changing content.
 
 ## Problem ##
-  > Describe the problem your product solves.
+  > Analytics is traditionally time delayed and geared towards aggregate data. 
+  There is value in watching individual users to identify issues hidden with 
+  the summarized data.
 
 ## Solution ##
-  > Describe how your product elegantly solves the problem.
+  > User interaction is presented in real-time, on the live site, to authorized
+  users.
 
 ## Quote from You ##
-  > A quote from a spokesperson in your company.
+  > "Users, not data"
 
 ## How to Get Started ##
-  > Describe how easy it is to get started.
+  > Sign up, copy, paste. 
+
+    Sign-up for an account to get your customized script tag. Copy the tag and
+    paste it onto any page you want to watch.
 
 ## Customer Quote ##
-  > Provide a quote from a hypothetical customer that describes how they experienced the benefit.
+  > "Over The Shoulder has saved us thousands in user testing" --Aperture Science.
 
 ## Closing and Call to Action ##
-  > Wrap it up and give pointers where the reader should go next.
+  > Click here for our secret FREE TRIAL!
