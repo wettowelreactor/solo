@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
 
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
     mochaTest: {
       test: {
         options: {
@@ -11,16 +12,20 @@ module.exports = function(grunt) {
     },
 
     browserify: {
-        'public/app.js': ['client/app.js']
+        'public/bundle.js': [
+          'client/client.js',
+          'client/d3.min.js', 
+          'client/socket.io.client.js', 
+        ],
+        browserifyOptions: {
+          debug: true
+        }
     },
 
     watch: {
       scripts: {
-        files: ['**/*.js'],
-        tasks: ['mochaTest', 'browserify', 'nodemon'],
-        options: {
-          spawn: false,
-        },
+        files: ['client/*.js'],
+        tasks: ['browserify'],
       },
     },
 
@@ -41,7 +46,20 @@ module.exports = function(grunt) {
   ////////////////////////////////////////////////////
   // Main grunt tasks
   ////////////////////////////////////////////////////
+  grunt.registerTask('server-dev', function (target) {
+    // Running nodejs in a different process and displaying output on the main console
+    var nodemon = grunt.util.spawn({
+         cmd: 'grunt',
+         grunt: true,
+         args: 'nodemon'
+    });
+    nodemon.stdout.pipe(process.stdout);
+    nodemon.stderr.pipe(process.stderr);
 
-  grunt.registerTask('default', ['watch']);
+    grunt.task.run([ 'watch' ]);
+  });
+
+
+  grunt.registerTask('default', ['server-dev']);
 
 };
