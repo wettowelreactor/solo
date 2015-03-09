@@ -13,6 +13,14 @@ io.on('connection', function(socket){
   socket.on('InitPayload', function(msg) {
     console.log(msg);
   });
+
+  socket.on('mousemove', function(msg) {
+    console.log(msg);
+  });
+
+  socket.on('scroll', function(msg) {
+    console.log(msg);
+  });
 });
 
 app.use(express.static(__dirname + '/../public'));

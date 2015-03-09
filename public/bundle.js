@@ -62,11 +62,17 @@ throttle = function(func, limit, context) {
 };
 
 throttledMouse = throttle(function(event){
-  console.log('mousemove', event.pageX, event.pageY);
+  socket.emit('mousemove', {
+    x: event.pageX, 
+    y: event.pageY
+  });
 }, 1000);
 
 throttledScroll = throttle(function(){
-  console.log('scroll', window.pageXOffset, window.pageYOffset);
+  socket.emit('scroll', {
+    xOffset: window.pageXOffset, 
+    yOffset: window.pageYOffset
+  });
 }, 1000);
 
 //Window pageXOffset and pageYOffset
