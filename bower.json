@@ -1,0 +1,22 @@
+{
+  "name": "OverTheShoulder",
+  "version": "2.0.1",
+  "homepage": "https://github.com/wettowelreactor/2015-02-solo",
+  "authors": [
+    "Camille Roussel <camille@rousselfamily.com>"
+  ],
+  "description": "Real-time user analytics",
+  "main": "app.js",
+  "license": "GPLv3",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.5.5"
+  }
+}

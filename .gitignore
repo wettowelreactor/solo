@@ -1,4 +1,6 @@
 ### node etc ###
+.DS_Store
+TestPage/
 
 # Logs
 logs

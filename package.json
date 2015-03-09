@@ -1,0 +1,34 @@
+{
+  "name": "OverTheShoulder",
+  "version": "2.0.1",
+  "description": "Real-time user analytics",
+  "main": "server.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wettowelreactor/2015-02-solo.git"
+  },
+  "author": "Camille Roussel",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/wettowelreactor/2015-02-solo/issues"
+  },
+  "homepage": "https://github.com/wettowelreactor/2015-02-solo",
+  "devDependencies": {
+    "browserify": "^9.0.3",
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^3.5.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-mocha-test": "^0.12.7",
+    "grunt-nodemon": "^0.4.0",
+    "grunt-notify": "^0.4.1",
+    "mocha": "^2.2.1"
+  },
+  "dependencies": {
+    "chai": "^2.1.1",
+    "express": "^4.12.2",
+    "socket.io": "^1.3.5"
+  }
+}
