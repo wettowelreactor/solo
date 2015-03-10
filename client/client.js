@@ -1,6 +1,7 @@
 var io = require('./socket.io.client.js');
 var d3 = require('./d3.min.js');
 
+var clients = {};
 var socket = io('http://localhost:3000');
 
 socket.emit('InitPayload', {
@@ -43,18 +44,31 @@ socket.emit('InitPayload', {
 
 socket.on('clientMouseMove', function(msg) {
   console.log('cmm: ', msg);
+  clients[msg.id] || (client[msg.id] = {});
+  clients[msg.id].x = msg.x;
+  clients[msg.id].y = msg.y;
 });
 
 socket.on('clientScroll', function(msg) {
   console.log('cs: ', msg);
+  clients[msg.id] || (client[msg.id] = {});
+  clients[msg.id].xOffset = msg.xOffset;
+  clients[msg.id].yOffset = msg.yOffset;
 });
 
 socket.on('clientGone', function(msg) {
   console.log('clientGone', msg);
+  delete clients[msg.id];
 });
 
-socket.on('clientSync', function(msg) {
+socket.on('clientSync', function(realClients) {
   console.log('clientSync', msg);
+  currentClients = Object.keys(clients);
+  currentClients.forEach(function(client) {
+    if (realClients.indexOf(client) === -1) {
+      delete clients[client];
+    }
+  });
 });
 
 throttle = function(func, limit, context) {
