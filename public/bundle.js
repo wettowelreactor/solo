@@ -50,6 +50,14 @@ window.addEventListener('load', function() {
   });
 }, false);
 
+socket.on('clientMouseMove', function(msg) {
+  console.log('cmm: ', msg);
+});
+
+socket.on('clientScroll', function(msg) {
+  console.log('cs: ', msg);
+});
+
 throttle = function(func, limit, context) {
   var then = Date.now();
   return function(){

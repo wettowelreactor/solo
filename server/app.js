@@ -2,12 +2,17 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 global.io = require('socket.io')(http);
+var numAdmins = 0;
+var numClients = 0;
 
 io.on('connection', function(socket) {
   console.log('New client connected (id=' + socket.id + ').');
+  numClients += 1;
   console.log('origin: ', socket.handshake.headers.origin);
   
   socket.on('disconnect', function() {
+    socket.OTSADMIN && (numAdmins -= 1);
+    numClients -= 1;
     console.info('Client gone (id=' + socket.id + ').');
   });
 
@@ -16,6 +21,8 @@ io.on('connection', function(socket) {
       if (msg.location.indexOf(socket.handshake.headers.origin) !== -1) {
         console.log('joining room: ', msg.location);
         socket.join(msg.location);
+        socket.OTSADMIN = true;
+        numAdmins += 1;
       } else {
         console.log('location/origin mismatch');
       }
@@ -29,11 +36,19 @@ io.on('connection', function(socket) {
   });
 
   socket.on('mousemove', function(msg) {
-    console.log(msg);
+    if (msg.location.indexOf(socket.handshake.headers.origin) !== -1) {
+      io.to(msg.location).emit('clientMouseMove', msg);
+    } else {
+      console.log('location/origin mismatch');
+    }
   });
 
   socket.on('scroll', function(msg) {
-    console.log(msg);
+    if (msg.location.indexOf(socket.handshake.headers.origin) !== -1) {
+      io.to(msg.location).emit('clientScroll', msg);
+    } else {
+      console.log('location/origin mismatch');
+    }
   });
 });
 
