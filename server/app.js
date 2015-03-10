@@ -61,6 +61,15 @@ io.on('connection', function(socket) {
     }
   });
 
+  socket.on('click', function(msg) {
+    console.log('click');
+    if (msg.location.indexOf(socket.handshake.headers.origin) !== -1) {
+      !socket.OTSADMIN && io.to(msg.location).emit('clientClick', msg);
+    } else {
+      console.log('location/origin mismatch');
+    }
+  });
+
   socket.on('scroll', function(msg) {
     if (msg.location.indexOf(socket.handshake.headers.origin) !== -1) {
       !socket.OTSADMIN && io.to(msg.location).emit('clientScroll', msg);

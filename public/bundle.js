@@ -49,7 +49,6 @@ var project = function(orignPoint, originScale, destinationScale) {
 };
 
 socket.on('clientMouseMove', function(msg) {
-  console.log('cmm: ', msg);
   var width = document.getElementsByTagName('body')[0].clientWidth;
   var height = document.getElementsByTagName('body')[0].clientHeight;
   clients[msg.id] || (clients[msg.id] = {id: msg.id});
@@ -58,7 +57,6 @@ socket.on('clientMouseMove', function(msg) {
 });
 
 socket.on('clientScroll', function(msg) {
-  console.log('cs: ', msg);
   clients[msg.id] || (clients[msg.id] = {id: msg.id});
   clients[msg.id].xOffset = project(msg.xOffset, msg.width, width);
   clients[msg.id].yOffset = project(msg.yOffset, msg.width, width);
@@ -66,7 +64,12 @@ socket.on('clientScroll', function(msg) {
 
 socket.on('clientGone', function(msg) {
   console.log('clientGone', msg);
-  delete clients[msg.id];
+  clientLeave(msg.id);
+});
+
+socket.on('clientClick', function(msg) {
+  console.log('clientClick', msg);
+  clientClick(msg.id);
 });
 
 socket.on('clientSync', function(realClients) {
@@ -74,7 +77,7 @@ socket.on('clientSync', function(realClients) {
   currentClients.forEach(function(client) {
     if (realClients.indexOf(client) === -1) {
       console.log('deleting dead client', client);
-      delete clients[client];
+      clientLeave(client);
     }
   });
 });
@@ -117,6 +120,17 @@ var throttledScroll = throttle(function(){
   });
 }, 17);
 
+var throttledClick = throttle(function(){
+  socket.emit('click', {
+    location: window.location.href,
+    id: socket.id,
+    x: event.pageX, 
+    y: event.pageY,
+    width: document.getElementsByTagName('body')[0].clientWidth,
+    height: document.getElementsByTagName('body')[0].clientHeight
+  });
+}, 17);
+
 var throttledClientSync = throttle(function(){
   socket.emit('requestClientSync', {location: window.location.href});
 }, 5000);
@@ -129,11 +143,29 @@ window.login = function(){
   });
 };
 
+var clientLeave = function(clientID) {
+  console.log('clientLeave');
+  clients[clientID].dead = true;
+  setTimeout(function() {
+    if (clients[clientID]) {
+      delete clients[clientID];
+    }
+  }, 5000);
+};
+
+var clientClick = function(clientID) {
+  console.log('clientClick');
+  clients[clientID].click = true;
+  setTimeout(function() {
+    clients[clientID].click = false;
+  }, 500);
+};
+
 var updateClientCursors = function() {
   var cursors = d3.select('body').selectAll('.clientCursor')
     .data(
       Object.keys(clients).map(function (key) {return clients[key];}), 
-      function(d) {console.log('pin: ', d.id); return d.id;}
+      function(d) {return d.id;}
     );
 
   cursors.enter()
@@ -155,7 +187,7 @@ var updateClientPins = function() {
   var pins = d3.select('body').selectAll('.clientPin')
     .data(
       Object.keys(clients).map(function (key) {return clients[key];}), 
-      function(d) {console.log('d: ', d); return d.id;}
+      function(d) {return d.id;}
     );
 
   pins.enter()
@@ -168,7 +200,9 @@ var updateClientPins = function() {
     '-webkit-transform': function(d){return getPinRotation(d.x, d.y);},
     '-ms-transform': function(d){return getPinRotation(d.x, d.y);},
     'transform': function(d){return getPinRotation(d.x, d.y);},
-  });
+  })
+  .classed('glowLeave', function(d){return d.dead;})
+  .classed('glowClick', function(d){return d.click;});
 
   pins.exit()
     .remove();
@@ -237,6 +271,9 @@ window.addEventListener('load', function() {
   window.addEventListener('mousemove', function(event) {
     throttledMouse(event);
   });
+  window.addEventListener('click', function(){
+    throttledClick();
+  });
 
   document.styleSheets[0].insertRule(
     '.clientCursor {' +
@@ -262,8 +299,13 @@ window.addEventListener('load', function() {
     '}', 0
   );
   document.styleSheets[0].insertRule(
-    '.glow {' +
+    '.glowClick {' +
       'box-shadow: 0px 0px 32px #ff0;' +
+    '}', 0
+  );
+  document.styleSheets[0].insertRule(
+    '.glowLeave {' +
+      'box-shadow: 0px 0px 32px #f00;' +
     '}', 0
   );
 }, false);
