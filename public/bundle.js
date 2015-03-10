@@ -63,12 +63,10 @@ socket.on('clientScroll', function(msg) {
 });
 
 socket.on('clientGone', function(msg) {
-  console.log('clientGone', msg);
   clientLeave(msg.id);
 });
 
 socket.on('clientClick', function(msg) {
-  console.log('clientClick', msg);
   clientClick(msg.id);
 });
 
@@ -76,7 +74,6 @@ socket.on('clientSync', function(realClients) {
   currentClients = Object.keys(clients);
   currentClients.forEach(function(client) {
     if (realClients.indexOf(client) === -1) {
-      console.log('deleting dead client', client);
       clientLeave(client);
     }
   });
@@ -144,17 +141,17 @@ window.login = function(){
 };
 
 var clientLeave = function(clientID) {
-  console.log('clientLeave');
-  clients[clientID].dead = true;
-  setTimeout(function() {
-    if (clients[clientID]) {
-      delete clients[clientID];
-    }
-  }, 5000);
+  if (clients[clientID]) {
+    clients[clientID].dead = true;
+    setTimeout(function() {
+      if (clients[clientID]) {
+        delete clients[clientID];
+      }
+    }, 5000);
+  }
 };
 
 var clientClick = function(clientID) {
-  console.log('clientClick');
   clients[clientID].click = true;
   setTimeout(function() {
     clients[clientID].click = false;
@@ -172,7 +169,9 @@ var updateClientCursors = function() {
     .append('div')
     .attr('class', 'clientCursor');
 
-  cursors.transition()
+  cursors.classed('glowLeave', function(d){return d.dead;})
+    .classed('glowClick', function(d){return d.click;})
+    .transition()
     .duration(750)
     .style({
       top: function(d){return d.y + 'px';},
@@ -200,9 +199,7 @@ var updateClientPins = function() {
     '-webkit-transform': function(d){return getPinRotation(d.x, d.y);},
     '-ms-transform': function(d){return getPinRotation(d.x, d.y);},
     'transform': function(d){return getPinRotation(d.x, d.y);},
-  })
-  .classed('glowLeave', function(d){return d.dead;})
-  .classed('glowClick', function(d){return d.click;});
+  });
 
   pins.exit()
     .remove();
