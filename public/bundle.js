@@ -113,7 +113,10 @@ window.login = function(){
 window.updateTick = function() {
   console.log('updateTick: ', clients);
   var cursors = d3.select('body').selectAll('.clientCursor')
-    .data(clients, function(d){console.log('d: ', d);return d.id;});
+    .data(
+      Object.keys(clients).map(function (key) {return clients[key];}), 
+      function(d) {console.log('d: ', d); return d.id;}
+    );
 
   cursors.enter()
     .append('div')
