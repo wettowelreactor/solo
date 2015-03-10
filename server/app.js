@@ -37,7 +37,7 @@ io.on('connection', function(socket) {
 
   socket.on('mousemove', function(msg) {
     if (msg.location.indexOf(socket.handshake.headers.origin) !== -1) {
-      io.to(msg.location).emit('clientMouseMove', msg);
+      !socket.OTSADMIN && io.to(msg.location).emit('clientMouseMove', msg);
     } else {
       console.log('location/origin mismatch');
     }
@@ -45,7 +45,7 @@ io.on('connection', function(socket) {
 
   socket.on('scroll', function(msg) {
     if (msg.location.indexOf(socket.handshake.headers.origin) !== -1) {
-      io.to(msg.location).emit('clientScroll', msg);
+      !socket.OTSADMIN && io.to(msg.location).emit('clientScroll', msg);
     } else {
       console.log('location/origin mismatch');
     }
