@@ -53,6 +53,10 @@ socket.on('clientGone', function(msg) {
   console.log('clientGone', msg);
 });
 
+socket.on('clientSync', function(msg) {
+  console.log('clientSync', msg);
+});
+
 throttle = function(func, limit, context) {
   var then = Date.now();
   return function(){
@@ -121,7 +125,3 @@ window.addEventListener('load', function() {
     '}', 0
   );
 }, false);
-
-
-
-
