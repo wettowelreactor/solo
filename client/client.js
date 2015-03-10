@@ -1,3 +1,5 @@
+//document.getElementsByTagName('body')[0].clientHeight
+
 var io = require('./socket.io.client.js');
 var d3 = require('./d3.min.js');
 
@@ -41,19 +43,24 @@ socket.emit('InitPayload', {
   referrer: document.referrer
 });
 
+var project = function(orignPoint, originScale, destinationScale) {
+  return (orignPoint * destinationScale) / originScale;
+};
 
 socket.on('clientMouseMove', function(msg) {
   console.log('cmm: ', msg);
+  var width = document.getElementsByTagName('body')[0].clientWidth;
+  var height = document.getElementsByTagName('body')[0].clientHeight;
   clients[msg.id] || (clients[msg.id] = {id: msg.id});
-  clients[msg.id].x = msg.x;
-  clients[msg.id].y = msg.y;
+  clients[msg.id].x = project(msg.x, msg.width, width);
+  clients[msg.id].y = project(msg.y, msg.height, height);
 });
 
 socket.on('clientScroll', function(msg) {
   console.log('cs: ', msg);
   clients[msg.id] || (clients[msg.id] = {id: msg.id});
-  clients[msg.id].xOffset = msg.xOffset;
-  clients[msg.id].yOffset = msg.yOffset;
+  clients[msg.id].xOffset = project(msg.xOffset, msg.width, width);
+  clients[msg.id].yOffset = project(msg.yOffset, msg.width, width);
 });
 
 socket.on('clientGone', function(msg) {
@@ -72,6 +79,10 @@ socket.on('clientSync', function(realClients) {
   });
 });
 
+socket.on('loggedIn', function() {
+  setInterval(updateTick, 1000);
+});
+
 var throttle = function(func, limit, context) {
   var then = Date.now();
   return function(){
@@ -88,18 +99,22 @@ var throttledMouse = throttle(function(event){
     location: window.location.href,
     id: socket.id,
     x: event.pageX, 
-    y: event.pageY
+    y: event.pageY,
+    width: document.getElementsByTagName('body')[0].clientWidth,
+    height: document.getElementsByTagName('body')[0].clientHeight
   });
-}, 1000);
+}, 17);
 
 var throttledScroll = throttle(function(){
   socket.emit('scroll', {
     location: window.location.href,
     id: socket.id,
     xOffset: window.pageXOffset, 
-    yOffset: window.pageYOffset
+    yOffset: window.pageYOffset,
+    width: document.getElementsByTagName('body')[0].clientWidth,
+    height: document.getElementsByTagName('body')[0].clientHeight
   });
-}, 1000);
+}, 17);
 
 window.login = function(){
   socket.emit('login', {
@@ -109,7 +124,7 @@ window.login = function(){
   });
 };
 
-window.updateTick = function() {
+var updateTick = function() {
   console.log('updateTick: ', clients);
   var cursors = d3.select('body').selectAll('.clientCursor')
     .data(
@@ -122,7 +137,7 @@ window.updateTick = function() {
     .attr('class', 'clientCursor');
 
   cursors.transition()
-    .duration(490)
+    .duration(750)
     .style({
       top: function(d){return d.y + 'px';},
       left: function(d){return d.x + 'px';}
@@ -145,7 +160,7 @@ window.addEventListener('load', function() {
   window.addEventListener('scroll', function(){
     throttledScroll();
   });
-  window.addEventListener('mousemove', function(event){
+  window.addEventListener('mousemove', function(event) {
     throttledMouse(event);
   });
 

@@ -32,6 +32,7 @@ io.on('connection', function(socket) {
         socket.join(origin);
         socket.OTSADMIN = true;
         numAdmins += 1;
+        socket.emit('loggedIn');
       } else {
         console.log('location/origin mismatch');
       }
