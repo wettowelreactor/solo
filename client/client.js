@@ -69,7 +69,6 @@ socket.on('clientGone', function(msg) {
 });
 
 socket.on('clientSync', function(realClients) {
-  console.log('clientSync', msg);
   currentClients = Object.keys(clients);
   currentClients.forEach(function(client) {
     if (realClients.indexOf(client) === -1) {
@@ -106,6 +105,7 @@ var throttledMouse = throttle(function(event){
 }, 17);
 
 var throttledScroll = throttle(function(){
+  updateClientPins();
   socket.emit('scroll', {
     location: window.location.href,
     id: socket.id,
@@ -115,6 +115,10 @@ var throttledScroll = throttle(function(){
     height: document.getElementsByTagName('body')[0].clientHeight
   });
 }, 17);
+
+var throttledClientSync = throttle(function(){
+  socket.emit('requestClientSync', {location: window.location.href});
+}, 5000);
 
 window.login = function(){
   socket.emit('login', {
@@ -128,7 +132,7 @@ var updateClientCursors = function() {
   var cursors = d3.select('body').selectAll('.clientCursor')
     .data(
       Object.keys(clients).map(function (key) {return clients[key];}), 
-      function(d) {console.log('d: ', d); return d.id;}
+      function(d) {console.log('pin: ', d.id); return d.id;}
     );
 
   cursors.enter()
@@ -213,6 +217,7 @@ var getPinRotation = function(x, y) {
 var updateTick = function() {
   updateClientCursors();
   updateClientPins();
+  throttledClientSync();
 };
 
 var addCSSRule = function(sheet, selector, rules, index) {
