@@ -49,6 +49,10 @@ socket.on('clientScroll', function(msg) {
   console.log('cs: ', msg);
 });
 
+socket.on('clientGone', function(msg) {
+  console.log('clientGone', msg);
+});
+
 throttle = function(func, limit, context) {
   var then = Date.now();
   return function(){
@@ -63,6 +67,7 @@ throttle = function(func, limit, context) {
 throttledMouse = throttle(function(event){
   socket.emit('mousemove', {
     location: window.location.href,
+    id: socket.id,
     x: event.pageX, 
     y: event.pageY
   });
@@ -71,6 +76,7 @@ throttledMouse = throttle(function(event){
 throttledScroll = throttle(function(){
   socket.emit('scroll', {
     location: window.location.href,
+    id: socket.id,
     xOffset: window.pageXOffset, 
     yOffset: window.pageYOffset
   });

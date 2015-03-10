@@ -8,21 +8,24 @@ var numClients = 0;
 io.on('connection', function(socket) {
   console.log('New client connected (id=' + socket.id + ').');
   numClients += 1;
-  console.log('origin: ', socket.handshake.headers.origin);
-  
 
   //todo kill client cursor on disconnect
   socket.on('disconnect', function() {
     socket.OTSADMIN && (numAdmins -= 1);
     numClients -= 1;
     console.info('Client gone (id=' + socket.id + ').');
+    io.to(socket.handshake.headers.origin).emit('clientGone', {
+      client: socket.id}
+    );
   });
 
   socket.on('login', function(msg) {
+    var origin = socket.handshake.headers.origin;
     if(msg.username === 'q' && msg.password === 'q') {
-      if (msg.location.indexOf(socket.handshake.headers.origin) !== -1) {
-        console.log('joining room: ', msg.location);
+      if (msg.location.indexOf(origin) !== -1) {
+        console.log('joining rooms: ', msg.location, origin);
         socket.join(msg.location);
+        socket.join(origin);
         socket.OTSADMIN = true;
         numAdmins += 1;
       } else {
