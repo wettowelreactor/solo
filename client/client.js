@@ -288,7 +288,7 @@ var genHeatMap = function(){
   mapwrapper.style.top = window.pageYOffset + 'px';
   //mapDiv.style.left = window.pageXOffset + 'px';
   //mapDiv.style.top = window.pageYOffset + 'px';
-  var existingMaps = document.querySelector('.heatmap-canvas')
+  var existingMaps = document.querySelector('.heatmap-canvas');
   if(existingMaps) {
     existingMaps.remove();
   }
