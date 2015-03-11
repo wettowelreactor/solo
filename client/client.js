@@ -2,8 +2,13 @@
 
 var io = require('./socket.io.client.js');
 var d3 = require('./d3.min.js');
+var heat = require('./heatmap.min.js').h337;
 
 var clients = {};
+var mapwrapper;
+var mapDiv;
+var clickmap;
+var movemap;
 var socket = io('http://localhost:3000');
 
 socket.emit('InitPayload', {
@@ -50,12 +55,26 @@ var project = function(orignPoint, originScale, destinationScale) {
 socket.on('clientMouseMove', function(msg) {
   var width = document.getElementsByTagName('body')[0].clientWidth;
   var height = document.getElementsByTagName('body')[0].clientHeight;
+  var projectedX = project(msg.x, msg.width, width);
+  var projectedY = project(msg.y, msg.height, height);
+  var projectedXOffset = project(msg.xOffset, msg.width, width);
+  var projectedYOffset = project(msg.yOffset, msg.height, height);
   clients[msg.id] || (clients[msg.id] = {id: msg.id});
-  clients[msg.id].x = project(msg.x, msg.width, width);
-  clients[msg.id].y = project(msg.y, msg.height, height);
+  clients[msg.id].x = projectedX;
+  clients[msg.id].y = projectedY;
+console.log(projectedX - projectedXOffset, projectedY - projectedYOffset);
+  if (movemap) {
+    movemap.addData({
+      x: projectedX - projectedXOffset,
+      y: projectedY - projectedYOffset,
+      value: 1
+    });
+  }
 });
 
 socket.on('clientScroll', function(msg) {
+  var width = document.getElementsByTagName('body')[0].clientWidth;
+  var height = document.getElementsByTagName('body')[0].clientHeight;
   clients[msg.id] || (clients[msg.id] = {id: msg.id});
   clients[msg.id].xOffset = project(msg.xOffset, msg.width, width);
   clients[msg.id].yOffset = project(msg.yOffset, msg.width, width);
@@ -99,6 +118,8 @@ var throttledMouse = throttle(function(event){
     id: socket.id,
     x: event.pageX, 
     y: event.pageY,
+    xOffset: window.pageXOffset,
+    yOffset: window.pageYOffset,
     width: document.getElementsByTagName('body')[0].clientWidth,
     height: document.getElementsByTagName('body')[0].clientHeight
   });
@@ -106,6 +127,7 @@ var throttledMouse = throttle(function(event){
 
 var throttledScroll = throttle(function(){
   updateClientPins();
+  genHeatMap();
   socket.emit('scroll', {
     location: window.location.href,
     id: socket.id,
@@ -260,6 +282,22 @@ var addCSSRule = function(sheet, selector, rules, index) {
   }
 };
 
+var genHeatMap = function(){
+  console.log('moving');
+  mapwrapper.style.left = window.pageXOffset + 'px';
+  mapwrapper.style.top = window.pageYOffset + 'px';
+  //mapDiv.style.left = window.pageXOffset + 'px';
+  //mapDiv.style.top = window.pageYOffset + 'px';
+  var existingMaps = document.querySelector('.heatmap-canvas')
+  if(existingMaps) {
+    existingMaps.remove();
+  }
+  movemap = heat.create({
+    container: mapDiv,
+    radius: 16
+  });
+};
+
 window.addEventListener('load', function() { 
   window.addEventListener('scroll', function(){
     throttledScroll();
@@ -270,6 +308,24 @@ window.addEventListener('load', function() {
   window.addEventListener('click', function(){
     throttledClick();
   });
+
+  mapwrapper = document.createElement('div');
+  mapDiv = document.createElement('div');
+  mapwrapper.style.width = window.innerWidth + 'px';
+  mapwrapper.style.height = window.innerHeight + 'px';
+  mapwrapper.style.position = 'absolute';
+  mapwrapper.style.left = '0px';
+  mapwrapper.style.top = '0px';
+  mapwrapper.style.zIndex = '4500';
+  mapDiv.style.width = window.innerWidth + 'px';
+  mapDiv.style.height = window.innerHeight + 'px';
+  mapDiv.style.position = 'absolute';
+  mapDiv.style.left = '0px';
+  mapDiv.style.top = '0px';
+  mapwrapper.appendChild(mapDiv);
+  document.body.appendChild(mapwrapper);
+
+  genHeatMap();
 
   document.styleSheets[0].insertRule(
     '.clientCursor {' +
