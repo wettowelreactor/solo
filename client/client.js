@@ -282,6 +282,14 @@ var addCSSRule = function(sheet, selector, rules, index) {
   }
 };
 
+window.toggleHeatMap = function() {
+  if (mapwrapper.style.visibility === 'visible') {
+    mapwrapper.style.visibility = 'hidden';
+  } else {
+    mapwrapper.style.visibility = 'visible';
+  }
+};
+
 var genHeatMap = function(){
   console.log('moving');
   mapwrapper.style.left = window.pageXOffset + 'px';
@@ -317,6 +325,7 @@ window.addEventListener('load', function() {
   mapwrapper.style.left = '0px';
   mapwrapper.style.top = '0px';
   mapwrapper.style.zIndex = '4500';
+  mapwrapper.style.visibility = 'visible';
   mapDiv.style.width = window.innerWidth + 'px';
   mapDiv.style.height = window.innerHeight + 'px';
   mapDiv.style.position = 'absolute';
@@ -325,6 +334,7 @@ window.addEventListener('load', function() {
   mapwrapper.appendChild(mapDiv);
   document.body.appendChild(mapwrapper);
 
+  toggleHeatMap();
   genHeatMap();
 
   document.styleSheets[0].insertRule(
