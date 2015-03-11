@@ -65,8 +65,8 @@ socket.on('clientMouseMove', function(msg) {
 console.log(projectedX - projectedXOffset, projectedY - projectedYOffset);
   if (movemap) {
     movemap.addData({
-      x: projectedX - projectedXOffset,
-      y: projectedY - projectedYOffset,
+      x: projectedX - window.pageXOffset, //projectedXOffset,
+      y: projectedY - window.pageYOffset, //projectedYOffset,
       value: 1
     });
   }
@@ -98,7 +98,7 @@ socket.on('clientSync', function(realClients) {
 });
 
 socket.on('loggedIn', function() {
-  setInterval(updateTick, 1000);
+  setInterval(updateTick, 250);
 });
 
 var throttle = function(func, limit, context) {
@@ -193,7 +193,7 @@ var updateClientCursors = function() {
   cursors.classed('glowLeave', function(d){return d.dead;})
     .classed('glowClick', function(d){return d.click;})
     .transition()
-    .duration(750)
+    .duration(200)
     .style({
       top: function(d){return d.y + 'px';},
       left: function(d){return d.x + 'px';}
